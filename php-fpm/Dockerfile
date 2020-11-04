@@ -846,6 +846,20 @@ RUN if [ ${INSTALL_SSHPASS} = true ]; then \
 ;fi
 
 ###########################################################################
+# Decimal:
+###########################################################################
+
+USER root
+
+ARG PHP_FPM_INSTALL_DECIMAL=false
+
+RUN if [ ${PHP_FPM_INSTALL_DECIMAL} = true ]; then \
+    apt-get -y install libmpdec-dev && \
+    pecl install decimal && \
+    echo "extension=decimal.so" > /usr/local/etc/php/conf.d/decimal.ini \
+;fi
+
+###########################################################################
 # FFMPEG:
 ###########################################################################
 
