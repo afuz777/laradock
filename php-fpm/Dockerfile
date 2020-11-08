@@ -23,6 +23,16 @@ ARG LARADOCK_PHP_VERSION
 # Set Environment Variables
 ENV DEBIAN_FRONTEND noninteractive
 
+###########################################################################
+# Set Timezone
+###########################################################################
+
+ARG TZ=UTC
+ENV TZ ${TZ}
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN date
+
 # If you're in China, or you need to change sources, will be set CHANGE_SOURCE to true in .env.
 
 ARG CHANGE_SOURCE=false
@@ -52,12 +62,12 @@ RUN set -xe; \
       # next lines are here becase there is no auto build on dockerhub see https://github.com/laradock/laradock/pull/1903#issuecomment-463142846
       libzip-dev zip unzip && \
       if [ ${LARADOCK_PHP_VERSION} = "7.3" ] || [ ${LARADOCK_PHP_VERSION} = "7.4" ]; then \
-        PHP_OPENSSL=yes docker-php-ext-configure zip; \
+        docker-php-ext-configure zip; \
       else \
-        PHP_OPENSSL=yes docker-php-ext-configure zip --with-libzip; \
+        docker-php-ext-configure zip --with-libzip; \
       fi && \
       # Install the zip extension
-      PHP_OPENSSL=yes docker-php-ext-install zip && \
+      docker-php-ext-install zip && \
       php -m | grep -q 'zip'
 
 #
@@ -851,12 +861,12 @@ RUN if [ ${INSTALL_SSHPASS} = true ]; then \
 
 USER root
 
-ARG PHP_FPM_INSTALL_DECIMAL=false
+ARG INSTALL_DECIMAL=false
 
-RUN if [ ${PHP_FPM_INSTALL_DECIMAL} = true ]; then \
+RUN if [ ${INSTALL_DECIMAL} = true ]; then \
+    apt-get update -yqq && \
     apt-get -y install libmpdec-dev && \
-    pecl install decimal && \
-    echo "extension=decimal.so" > /usr/local/etc/php/conf.d/decimal.ini \
+    pecl install decimal \
 ;fi
 
 ###########################################################################
@@ -944,6 +954,7 @@ RUN set -xe; php -v | head -n 1 | grep -q "PHP ${LARADOCK_PHP_VERSION}."
 
 COPY ./laravel.ini /usr/local/etc/php/conf.d
 COPY ./xlaravel.pool.conf /usr/local/etc/php-fpm.d/
+COPY ./decimal.ini /usr/local/etc/php/conf.d
 
 USER root
 

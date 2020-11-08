@@ -199,6 +199,20 @@ COPY ./crontab /etc/cron.d
 RUN chmod -R 644 /etc/cron.d
 
 ###########################################################################
+# Decimal:
+###########################################################################
+
+USER root
+
+ARG INSTALL_DECIMAL=false
+RUN if [ ${INSTALL_DECIMAL} = true ]; then \
+    apt-get update -yqq && \
+    apt-get -y install libmpdec-dev && \
+    pecl install decimal && \
+    echo "extension=decimal.so" > /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/decimal.ini \
+;fi
+
+###########################################################################
 # Drush:
 ###########################################################################
 
