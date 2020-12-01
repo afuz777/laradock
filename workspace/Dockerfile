@@ -1381,7 +1381,17 @@ bindkey "^[[6~" down-line-or-history\n\
 bindkey "^?" backward-delete-char\n' >> /home/laradock/.zshrc \
 ;fi
 
+###########################################################################
+# LAZYGIT:
+###########################################################################
 USER root
+
+ARG WORKSPACE_INSTALL_LAZYGIT=false
+RUN if [ ${WORKSPACE_INSTALL_LAZYGIT} = true ]; then \
+    add-apt-repository ppa:lazygit-team/release && \
+    apt-get update -yqq && \
+    apt-get install -y lazygit \
+;fi
 
 #
 #--------------------------------------------------------------------------
